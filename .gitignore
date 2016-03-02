@@ -3,3 +3,6 @@
 *.o
 .gitignore
 electrum.conf
+build/*
+*.egg-info/*
+dist/*

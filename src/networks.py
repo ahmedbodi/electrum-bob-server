@@ -20,5 +20,15 @@ params = {
         'pubkey_address': 111,
         'script_address': 196,
         'genesis_hash': 'f5ae71e26c74beacc88382716aced69cddf3dffff24f384e1808905e0188f68f'
-    }
+    },
+    'dobbscoin_main': {
+	'pubkey_address': 0,
+	'script_address': 5,
+	'genesis_hash': '6d2d7d525900712451b9697d0b5b2304ebae6efb349540da445bf575c0159969'
+   },
+   'dobbscoin_test': {
+	'pubkey_address': 111,
+	'script_address': 196,
+	'genesis_hash': 'b83bb8028229439a4e645a56d48ee31b884efdb0e395c8538a10a462166563f3',
+   },
 }

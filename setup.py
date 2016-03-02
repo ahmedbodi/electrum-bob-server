@@ -1,31 +1,31 @@
 from setuptools import setup
 
 setup(
-    name="electrum-ltc-server",
+    name="electrum-bob-server",
     version="1.0",
-    scripts=['run_electrum_ltc_server.py','electrum-ltc-server'],
+    scripts=['run_electrum_bob_server.py','electrum-bob-server'],
     install_requires=['plyvel','jsonrpclib', 'irc>=11'],
     package_dir={
-        'electrumltcserver':'src'
+        'electrumbobserver':'src'
         },
     py_modules=[
-        'electrumltcserver.__init__',
-        'electrumltcserver.utils',
-        'electrumltcserver.storage',
-        'electrumltcserver.deserialize',
-        'electrumltcserver.networks',
-        'electrumltcserver.blockchain_processor',
-        'electrumltcserver.server_processor',
-        'electrumltcserver.processor',
-        'electrumltcserver.version',
-        'electrumltcserver.ircthread',
-        'electrumltcserver.stratum_tcp',
-        'electrumltcserver.stratum_http'
+        'electrumbobserver.__init__',
+        'electrumbobserver.utils',
+        'electrumbobserver.storage',
+        'electrumbobserver.deserialize',
+        'electrumbobserver.networks',
+        'electrumbobserver.blockchain_processor',
+        'electrumbobserver.server_processor',
+        'electrumbobserver.processor',
+        'electrumbobserver.version',
+        'electrumbobserver.ircthread',
+        'electrumbobserver.stratum_tcp',
+        'electrumbobserver.stratum_http'
     ],
-    description="Litecoin Electrum Server",
+    description="Dobbscoin Electrum Server",
     author="Thomas Voegtlin",
     author_email="thomasv@electrum.org",
     license="MIT Licence",
-    url="https://github.com/pooler/electrum-ltc-server/",
-    long_description="""Server for the Electrum Lightweight Litecoin Wallet"""
+    url="https://github.com/pooler/electrum-bob-server/",
+    long_description="""Server for the Electrum Lightweight Dobbscoin Wallet"""
 )

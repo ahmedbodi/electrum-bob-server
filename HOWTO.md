@@ -12,7 +12,7 @@ requirements.
 
 The most up-to date version of this document is available at:
 
-    https://github.com/pooler/electrum-ltc-server/blob/master/HOWTO.md
+    https://github.com/ahmedbodi/electrum-bob-server/blob/master/HOWTO.md
 
 Conventions
 -----------
@@ -20,8 +20,8 @@ Conventions
 In this document, lines starting with a hash sign (#) or a dollar sign ($)
 contain commands. Commands starting with a hash should be run as root,
 commands starting with a dollar should be run as a normal user (in this
-document, we assume that user is called 'litecoin'). We also assume the
-litecoin user has sudo rights, so we use `$ sudo command` when we need to.
+document, we assume that user is called 'dobbscoin'). We also assume the
+dobbscoin user has sudo rights, so we use `$ sudo command` when we need to.
 
 Strings that are surrounded by "lower than" and "greater than" ( < and > )
 should be replaced by the user with something appropriate. For example,
@@ -54,16 +54,16 @@ Python libraries. Python 2.7 is the minimum supported version.
 
 **Hardware.** The lightest setup is a pruning server with diskspace
 requirements of about 5 GB for the Electrum database (February 2016). However note that
-you also need to run litecoind and keep a copy of the full blockchain,
+you also need to run dobbscoind and keep a copy of the full blockchain,
 which is roughly 6 GB (February 2016). Ideally you have a machine with 4 GB of RAM
-and an equal amount of swap. If you have ~2 GB of RAM make sure you limit litecoind 
-to 8 concurrent connections by disabling incoming connections. electrum-ltc-server may
+and an equal amount of swap. If you have ~2 GB of RAM make sure you limit dobbscoind 
+to 8 concurrent connections by disabling incoming connections. electrum-bob-server may
 bail-out on you from time to time with less than 2 GB of RAM, so you might have to 
 monitor the process and restart it. You can tweak cache sizes in the config to an extend
 but most RAM will be used to process blocks and catch-up on initial start.
 
-CPU speed is less important than fast I/O speed. electrum-ltc-server makes uses of one core 
-only leaving spare cycles for bitcoind. Fast single core CPU power helps for the initial 
+CPU speed is less important than fast I/O speed. electrum-bob-server makes uses of one core 
+only leaving spare cycles for dobbscoind. Fast single core CPU power helps for the initial 
 block chain import. Any multi-core x86 CPU with CPU Mark / PassMark > 1500 will work
 (see https://www.cpubenchmark.net/). An ideal setup in February 2016 has 4 GB+ RAM and
 SSD for good i/o speed.
@@ -71,52 +71,52 @@ SSD for good i/o speed.
 Instructions
 ------------
 
-### Step 1. Create a user for running litecoind and Electrum server
+### Step 1. Create a user for running dobbscoind and Electrum server
 
 This step is optional, but for better security and resource separation I
-suggest you create a separate user just for running `litecoind` and Electrum.
+suggest you create a separate user just for running `dobbscoind` and Electrum.
 We will also use the `~/bin` directory to keep locally installed files
 (others might want to use `/usr/local/bin` instead). We will download source
 code files to the `~/src` directory.
 
-    $ sudo adduser litecoin --disabled-password
+    $ sudo adduser dobbscoin --disabled-password
     $ sudo apt-get install git
-    $ sudo su - litecoin
+    $ sudo su - dobbscoin
     $ mkdir ~/bin ~/src
     $ echo $PATH
 
-If you don't see `/home/litecoin/bin` in the output, you should add this line
+If you don't see `/home/dobbscoin/bin` in the output, you should add this line
 to your `.bashrc`, `.profile`, or `.bash_profile`, then logout and relogin:
 
     PATH="$HOME/bin:$PATH"
     $ exit
 
-### Step 2. Download litecoind
+### Step 2. Download dobbscoind
 
-We currently recommend litecoind 0.10.4.0 stable.
+We currently recommend dobbscoind master
 
-If you prefer to compile litecoind, here are some pointers for Ubuntu:
+If you prefer to compile dobbscoind, here are some pointers for Ubuntu:
 
     $ sudo apt-get install make g++ python-leveldb libboost-all-dev libssl-dev libdb++-dev pkg-config automake libtool
-    $ sudo su - litecoin
-    $ cd ~/src && git clone https://github.com/litecoin-project/litecoin.git -b master-0.10
-    $ cd litecoin
+    $ sudo su - dobbscoin
+    $ cd ~/src && git clone https://github.com/dobbscoin/dobbscoin-source.git -b master
+    $ cd dobbscoin
     $ ./autogen.sh
     $ ./configure --disable-wallet --without-miniupnpc
     $ make
-    $ strip src/litecoind src/litecoin-cli src/litecoin-tx
-    $ cp -a src/litecoind src/litecoin-cli src/litecoin-tx ~/bin
+    $ strip src/dobbscoind src/dobbscoin-cli src/dobbscoin-tx
+    $ cp -a src/dobbscoind src/dobbscoin-cli src/dobbscoin-tx ~/bin
 
-### Step 3. Configure and start litecoind
+### Step 3. Configure and start dobbscoind
 
-In order to allow Electrum to "talk" to `litecoind`, we need to set up an RPC
-username and password for `litecoind`. We will then start `litecoind` and
+In order to allow Electrum to "talk" to `dobbscoind`, we need to set up an RPC
+username and password for `dobbscoind`. We will then start `dobbscoind` and
 wait for it to complete downloading the blockchain.
 
-    $ mkdir ~/.litecoin
-    $ $EDITOR ~/.litecoin/litecoin.conf
+    $ mkdir ~/.dobbscoin
+    $ $EDITOR ~/.dobbscoin/dobbscoin.conf
 
-Write this in `litecoin.conf`:
+Write this in `dobbscoin.conf`:
 
     rpcuser=<rpc-username>
     rpcpassword=<rpc-password>
@@ -125,24 +125,24 @@ Write this in `litecoin.conf`:
     disablewallet=1
 
 
-If you have an existing installation of litecoind and have not previously
+If you have an existing installation of dobbscoind and have not previously
 set txindex=1 you need to reindex the blockchain by running
 
-    $ litecoind -reindex
+    $ dobbscoind -reindex
 
-If you already have a freshly indexed copy of the blockchain with txindex start `litecoind`:
+If you already have a freshly indexed copy of the blockchain with txindex start `dobbscoind`:
 
-    $ litecoind
+    $ dobbscoind
 
-Allow some time to pass, so `litecoind` connects to the network and starts
+Allow some time to pass, so `dobbscoind` connects to the network and starts
 downloading blocks. You can check its progress by running:
 
-    $ litecoin-cli getinfo
+    $ dobbscoin-cli getinfo
 
-Before starting the Electrum server your litecoind should have processed all
+Before starting the Electrum server your dobbscoind should have processed all
 blocks and caught up to the current height of the network (not just the headers).
-You should also set up your system to automatically start litecoind at boot
-time, running as the 'litecoin' user. Check your system documentation to
+You should also set up your system to automatically start dobbscoind at boot
+time, running as the 'dobbscoin' user. Check your system documentation to
 find out the best way to do this.
 
 ### Step 4. Download and install Electrum server
@@ -150,8 +150,8 @@ find out the best way to do this.
 We will download the latest git snapshot for Electrum to configure and install it:
 
     $ cd ~
-    $ git clone https://github.com/pooler/electrum-ltc-server.git
-    $ cd electrum-ltc-server
+    $ git clone https://github.com/ahmedbodi/electrum-bob-server.git
+    $ cd electrum-bob-server
     $ sudo configure
     $ sudo python setup.py install
 
@@ -192,15 +192,7 @@ The section in the electrum server configuration file (see step 10) looks like t
      # for each address, history will be pruned if it is longer than this limit
      pruning_limit = 100
 
-### Step 7. Import blockchain into the database or download it
-
-It's recommended that you fetch a pre-processed leveldb from the net.
-The "configure" script above will offer you to download a database with pruning limit 100.
-
-You can fetch recent copies of electrum leveldb databases with different pruning limits
-and further instructions from the Electrum-LTC full archival server foundry at:
-http://foundry.electrum-ltc.org/leveldb-dump/
-
+### Step 7. Import blockchain into the database
 
 Alternatively, if you have the time and nerve, you can import the blockchain yourself.
 
@@ -267,11 +259,11 @@ in case you need to restore them.
 
 ### Step 9. Configure Electrum server
 
-Electrum reads a config file (/etc/electrum-ltc.conf) when starting up. This
-file includes the database setup, litecoind RPC setup, and a few other
+Electrum reads a config file (/etc/electrum-bob.conf) when starting up. This
+file includes the database setup, dobbscoind RPC setup, and a few other
 options.
 
-The "configure" script listed above will create a config file at /etc/electrum-ltc.conf
+The "configure" script listed above will create a config file at /etc/electrum-bob.conf
 which you can edit to modify the settings.
 
 Go through the config options and set them to your liking.
@@ -283,12 +275,12 @@ Electrum server currently needs quite a few file handles to use leveldb. It also
 file handles for each connection made to the server. It's good practice to increase the
 open files limit to 64k.
 
-The "configure" script will take care of this and ask you to create a user for running electrum-ltc-server.
-If you're using the user `litecoin` to run electrum and have added it as shown in this document, run
+The "configure" script will take care of this and ask you to create a user for running electrum-bob-server.
+If you're using the user `dobbscoin` to run electrum and have added it as shown in this document, run
 the following code to add the limits to your /etc/security/limits.conf:
 
-     echo "litecoin hard nofile 65536" >> /etc/security/limits.conf
-     echo "litecoin soft nofile 65536" >> /etc/security/limits.conf
+     echo "dobbscoin hard nofile 65536" >> /etc/security/limits.conf
+     echo "dobbscoin soft nofile 65536" >> /etc/security/limits.conf
 
 If you are on Debian > 8.0 Jessie or another distribution based on it, you also need to add these lines in /etc/pam.d/common-session and /etc/pam.d/common-session-noninteractive otherwise the limits in /etc/security/limits.conf will not work:
 
@@ -297,30 +289,30 @@ If you are on Debian > 8.0 Jessie or another distribution based on it, you also 
 
 Check if the limits are changed either by logging with the user configured to run Electrum server as. Example:
 
-    su - litecoin
+    su - dobbscoin
     ulimit -n
 
 Or if you use sudo and the user is added to sudoers group:
 
-    sudo -u litecoin -i ulimit -n
+    sudo -u dobbscoin -i ulimit -n
 
 
 Two more things for you to consider:
 
 1. To increase privacy of transactions going through your server
-   you may want to close litecoind for incoming connections and connect outbound only. Most servers do run
+   you may want to close dobbscoind for incoming connections and connect outbound only. Most servers do run
    full nodes with open incoming connections though.
 
-2. Consider restarting litecoind (together with electrum-ltc-server) on a weekly basis to clear out unconfirmed
+2. Consider restarting dobbscoind (together with electrum-bob-server) on a weekly basis to clear out unconfirmed
    transactions from the local the memory pool which did not propagate over the network.
 
 ### Step 11. (Finally!) Run Electrum server
 
 The magic moment has come: you can now start your Electrum server as root (it will su to your unprivileged user):
 
-    # electrum-ltc-server start
+    # electrum-bob-server start
 
-Note: If you want to run the server without installing it on your system, just run 'run_electrum_ltc_server" as the
+Note: If you want to run the server without installing it on your system, just run 'run_electrum_bob_server" as the
 unprivileged user.
 
 You should see this in the log file:
@@ -335,15 +327,15 @@ The important pieces to you are at the end. In this example, the server has to c
 
 If you want to stop Electrum server, use the 'stop' command:
 
-    # electrum-ltc-server stop
+    # electrum-bob-server stop
 
 
-If your system supports it, you may add electrum-ltc-server to the /etc/init.d directory.
+If your system supports it, you may add electrum-bob-server to the /etc/init.d directory.
 This will ensure that the server is started and stopped automatically, and that the database is closed
 safely whenever your machine is rebooted.
 
-    # ln -s `which electrum-ltc-server` /etc/init.d/electrum-ltc-server
-    # update-rc.d electrum-ltc-server defaults
+    # ln -s `which electrum-bob-server` /etc/init.d/electrum-bob-server
+    # update-rc.d electrum-bob-server defaults
 
 ### Step 12. Test the Electrum server
 
@@ -356,16 +348,11 @@ or hostname and the port. Press 'Ok' and the client will disconnect from the
 current server and connect to your new Electrum server. You should see your
 addresses and transactions history. You can see the number of blocks and
 response time in the server selection window. You should send/receive some
-litecoins to confirm that everything is working properly.
+dobbscoins to confirm that everything is working properly.
 
 ### Step 13. Join us on IRC, subscribe to the server thread
 
 Say hi to the dev crew, other server operators, and fans on
-irc.freenode.net #electrum-ltc and we'll try to congratulate you
-on supporting the community by running an Electrum-LTC node.
+irc.freenode.net #electrum-bob and we'll try to congratulate you
+on supporting the community by running an Electrum-BOB node.
 
-If you're operating a public Electrum-LTC server please subscribe
-to the following mailing list:
-https://groups.google.com/forum/#!forum/electrum-ltc-server
-It'll contain announcements about important updates to Electrum-LTC
-server required for a smooth user experience.
